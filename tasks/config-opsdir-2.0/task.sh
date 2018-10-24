@@ -316,7 +316,7 @@ director_config=$(cat <<-EOF
   "ntp_servers_string": "$NTP_SERVERS",
   "resurrector_enabled": true,
   "post_deploy_enabled": true,
-  "bosh_recreate_on_next_deploy": true,
+  "bosh_recreate_on_next_deploy": false,
   "max_threads": null,
   "database_type": "internal",
   "blobstore_type": "local"
