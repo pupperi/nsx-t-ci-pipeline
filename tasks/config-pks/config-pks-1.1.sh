@@ -241,7 +241,7 @@ pks_vcenter_properties=$(
     --arg pks_vcenter_cluster "$PKS_VCENTER_CLUSTER" \
     --arg vcenter_datacenter "$PKS_VCENTER_DATA_CENTER" \
     --arg pks_vm_folder "$PKS_VM_FOLDER" \
-    --arg vcenter_datastore "$PKS_VCENTER_DATASTORE"
+    --arg vcenter_datastore "$PKS_VCENTER_DATASTORE" \
     '
     {
       ".properties.cloud_provider": {
@@ -330,7 +330,7 @@ if [ "$NSX_ENABLED" == "true" ]; then
       --arg pks_nsx_nat_mode "$PKS_NSX_NAT_MODE" \
       --arg has_vcenter_clusters "$has_vcenter_clusters" \
       --arg nsx_superuser_cert "$NSX_SUPERUSER_CERT" \
-      --arg nsx_superuser_key "$NSX_SUPERUSER_KEY"
+      --arg nsx_superuser_key "$NSX_SUPERUSER_KEY" \
       '
       {
         ".properties.network_selector": {
