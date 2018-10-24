@@ -11,7 +11,7 @@ source $ROOT_DIR/nsx-t-ci-pipeline/functions/yaml2json.sh
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/check_null_variables.sh
 
 echo "checking if NSX is enabled"
-if [ "$NSX_ENABLED" == "false" ]; then
+if [ "$NSX_ENABLED" != "true" ]; then
   echo "NSX not enabled, nothing to validate"
   exit 0
 fi
