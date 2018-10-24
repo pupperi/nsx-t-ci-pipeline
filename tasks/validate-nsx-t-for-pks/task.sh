@@ -10,6 +10,11 @@ export PYTHON_LIB_DIR=$(cd $PIPELINE_DIR/python && pwd)
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/yaml2json.sh
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/check_null_variables.sh
 
+
+if [ "$NSX_ENABLED" == "false" ]; then
+  exit 0
+fi
+
 # Check if NSX Manager is accessible before pulling down its cert
 set +e
 curl -kv https://${NSX_API_MANAGER} >/dev/null 2>/dev/null

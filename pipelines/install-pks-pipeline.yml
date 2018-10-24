@@ -503,6 +503,7 @@ jobs:
   - task: validate-nsx-config-for-pks
     file: nsx-t-ci-pipeline/tasks/validate-nsx-t-for-pks/task.yml
     params:
+      NSX_ENABLED: ((pks_tile_nsx_enabled))
       NSX_API_MANAGER: ((nsx_address))
       NSX_API_USER: ((nsx_username))
       NSX_API_PASSWORD: ((nsx_password))

@@ -8,6 +8,7 @@ image_resource:
     repository: czero/cflinuxfs2
 
 params:
+  NSX_ENABLED:
   NSX_API_MANAGER:
   NSX_API_USER:
   NSX_API_PASSWORD:
