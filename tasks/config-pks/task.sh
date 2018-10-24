@@ -9,48 +9,53 @@ source $ROOT_DIR/nsx-t-ci-pipeline/functions/generate_cert.sh
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/yaml2json.sh
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/check_null_variables.sh
 
-# Check if NSX Manager is accessible before pulling down its cert
-set +e
-curl -kv https://${NSX_API_MANAGER} >/dev/null 2>/dev/null
-connect_status=$?
-set -e
+echo "checking if NSX is enabled"
+if [ "$NSX_ENABLED" == "true" ]; then
+  echo "NSX enabled...
 
-if [ "$connect_status" != "0" ]; then
-  echo "Error in connecting to ${NSX_API_MANAGER} over 443, please check and correct the NSX Mgr address or dns entries and retry!!"
-  exit -1
+  # Check if NSX Manager is accessible before pulling down its cert
+  set +e
+  curl -kv https://${NSX_API_MANAGER} >/dev/null 2>/dev/null
+  connect_status=$?
+  set -e
+
+  if [ "$connect_status" != "0" ]; then
+    echo "Error in connecting to ${NSX_API_MANAGER} over 443, please check and correct the NSX Mgr address or dns entries and retry!!"
+    exit -1
+  fi
+
+  openssl s_client  -servername $NSX_API_MANAGER \
+                    -connect ${NSX_API_MANAGER}:443 \
+                    </dev/null 2>/dev/null \
+                    | openssl x509 -text \
+                    >  /tmp/complete_nsx_manager_cert.log
+
+  export NSX_MANAGER_CERT_ADDRESS=`cat /tmp/complete_nsx_manager_cert.log \
+                          | grep Subject | grep "CN=" \
+                          | tr , '\n' | grep 'CN=' \
+                          | sed -e 's/.* CN=//' `
+
+  echo "Fully qualified domain name for NSX Manager: $NSX_API_MANAGER"
+  echo "Host name associated with NSX Manager cert: $NSX_MANAGER_CERT_ADDRESS"
+
+  # Get all certs from the nsx manager
+  openssl s_client -host $NSX_API_MANAGER \
+                   -port 443 -prexit -showcerts \
+                   </dev/null 2>/dev/null  \
+                   >  /tmp/nsx_manager_all_certs.log
+
+  # Get the very last CA cert from the showcerts result
+  cat /tmp/nsx_manager_all_certs.log \
+                    |  awk '/BEGIN /,/END / {print }' \
+                    | tail -50                        \
+                    |  awk '/BEGIN /,/END / {print }' \
+                    >  /tmp/nsx_manager_cacert.log
+
+  # Strip newlines and replace them with \r\n
+  cat /tmp/nsx_manager_cacert.log | tr '\n' '#'| sed -e 's/#/\r\n/g'   > /tmp/nsx_manager_edited_cacert.log
+  export NSX_API_CA_CERT=$(cat /tmp/nsx_manager_edited_cacert.log)
+
 fi
-
-openssl s_client  -servername $NSX_API_MANAGER \
-                  -connect ${NSX_API_MANAGER}:443 \
-                  </dev/null 2>/dev/null \
-                  | openssl x509 -text \
-                  >  /tmp/complete_nsx_manager_cert.log
-
-export NSX_MANAGER_CERT_ADDRESS=`cat /tmp/complete_nsx_manager_cert.log \
-                        | grep Subject | grep "CN=" \
-                        | tr , '\n' | grep 'CN=' \
-                        | sed -e 's/.* CN=//' `
-
-echo "Fully qualified domain name for NSX Manager: $NSX_API_MANAGER"
-echo "Host name associated with NSX Manager cert: $NSX_MANAGER_CERT_ADDRESS"
-
-# Get all certs from the nsx manager
-openssl s_client -host $NSX_API_MANAGER \
-                 -port 443 -prexit -showcerts \
-                 </dev/null 2>/dev/null  \
-                 >  /tmp/nsx_manager_all_certs.log
-
-# Get the very last CA cert from the showcerts result
-cat /tmp/nsx_manager_all_certs.log \
-                  |  awk '/BEGIN /,/END / {print }' \
-                  | tail -50                        \
-                  |  awk '/BEGIN /,/END / {print }' \
-                  >  /tmp/nsx_manager_cacert.log
-
-# Strip newlines and replace them with \r\n
-cat /tmp/nsx_manager_cacert.log | tr '\n' '#'| sed -e 's/#/\r\n/g'   > /tmp/nsx_manager_edited_cacert.log
-export NSX_API_CA_CERT=$(cat /tmp/nsx_manager_edited_cacert.log)
-
 
 check_bosh_version
 check_available_product_version "pivotal-container-service"

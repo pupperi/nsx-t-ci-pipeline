@@ -59,6 +59,7 @@ pks_config_params: &pks-config-params
   PKS_SSL_PRIVATE_KEY: ((pks_tile_private_key_pem))
   PKS_SYSTEM_DOMAIN: ((pks_tile_system_domain))
   PKS_UAA_DOMAIN_PREFIX: ((pks_tile_uaa_domain_prefix))
+  NSX_ENABLED: ((pks_tile_nsx_enabled))
   NSX_API_MANAGER: ((nsx_address))
   NSX_API_USER: ((nsx_username))
   NSX_API_PASSWORD: ((nsx_password))
