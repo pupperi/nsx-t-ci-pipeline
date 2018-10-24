@@ -233,7 +233,7 @@ has_nsx_t_superuser_certificate=$(cat "/tmp/staged_product_${PRODUCT_GUID}.json"
 has_cloud_config_dns=$(cat "/tmp/staged_product_${PRODUCT_GUID}.json" | jq . | grep ".properties.network_selector.nsx.cloud-config-dns" | wc -l || true)
 has_vcenter_clusters=$(cat "/tmp/staged_product_${PRODUCT_GUID}.json" | jq . | grep ".properties.network_selector.nsx.vcenter_cluster" | wc -l || true)
 
-pks_nsx_vcenter_properties=$(
+pks_vcenter_properties=$(
   jq -n \
     --arg vcenter_host "$PKS_VCENTER_HOST" \
     --arg vcenter_username "$PKS_VCENTER_USR" \
@@ -283,7 +283,6 @@ pks_nsx_vcenter_properties=$(
     end
   '
 )
-
 
 om-linux \
   -t https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
