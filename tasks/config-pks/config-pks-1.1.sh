@@ -331,7 +331,7 @@ if [ "$NSX_ENABLED" == "true" ]; then
       --arg pks_nsx_nat_mode "$PKS_NSX_NAT_MODE" \
       --arg has_vcenter_clusters "$has_vcenter_clusters" \
       --arg nsx_superuser_cert "$NSX_SUPERUSER_CERT" \
-      --arg nsx_superuser_key "$NSX_SUPERUSER_KEY" \
+      --arg nsx_superuser_key "$NSX_SUPERUSER_KEY"
       '
       {
         ".properties.network_selector": {
