@@ -233,12 +233,75 @@ has_nsx_t_superuser_certificate=$(cat "/tmp/staged_product_${PRODUCT_GUID}.json"
 has_cloud_config_dns=$(cat "/tmp/staged_product_${PRODUCT_GUID}.json" | jq . | grep ".properties.network_selector.nsx.cloud-config-dns" | wc -l || true)
 has_vcenter_clusters=$(cat "/tmp/staged_product_${PRODUCT_GUID}.json" | jq . | grep ".properties.network_selector.nsx.vcenter_cluster" | wc -l || true)
 
+pks_nsx_vcenter_properties=$(
+  jq -n \
+    --arg vcenter_host "$PKS_VCENTER_HOST" \
+    --arg vcenter_username "$PKS_VCENTER_USR" \
+    --arg vcenter_password "$PKS_VCENTER_PWD" \
+    --arg pks_vcenter_cluster "$PKS_VCENTER_CLUSTER" \
+    --arg vcenter_datacenter "$PKS_VCENTER_DATA_CENTER" \
+    --arg pks_vm_folder "$PKS_VM_FOLDER" \
+    --arg vcenter_datastore "$PKS_VCENTER_DATASTORE"
+    '
+    {
+      ".properties.cloud_provider": {
+        "value": "vSphere"
+      },
+      ".properties.cloud_provider.vsphere.vcenter_ip": {
+        "value": $vcenter_host
+      },
+      ".properties.cloud_provider.vsphere.vcenter_dc": {
+        "value": $vcenter_datacenter
+      },
+      ".properties.cloud_provider.vsphere.vcenter_ds": {
+        "value": $vcenter_datastore
+      },
+      ".properties.cloud_provider.vsphere.vcenter_vms": {
+        "value": $pks_vm_folder
+      },
+      ".properties.cloud_provider.vsphere.vcenter_master_creds": {
+        "value": {
+          "identity": $vcenter_username,
+          "password": $vcenter_password
+        }
+      }
+    }
+
+    +
+
+    if $has_vcenter_worker_creds != "0" then
+    {
+      ".properties.cloud_provider.vsphere.vcenter_worker_creds": {
+        "value": {
+          "identity": $vcenter_username,
+          "password": $vcenter_password
+        }
+      }
+    }
+    else
+    .
+    end
+  '
+)
+
+
+om-linux \
+  -t https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
+  -u $OPSMAN_USERNAME \
+  -p $OPSMAN_PASSWORD \
+  --skip-ssl-validation \
+  configure-product \
+  --product-name pivotal-container-service \
+  --product-properties "$pks_vcenter_properties"
+
+echo "Finished configuring vCenter properties"
+
 if [ "$NSX_ENABLED" == "true" ]; then
   if [ "$PKS_NSX_NAT_MODE" == '' -o "$PKS_NSX_NAT_MODE" == "null" ]; then
     PKS_NSX_NAT_MODE=true
   fi
 
-  pks_nsx_vcenter_properties=$(
+  pks_nsx_properties=$(
     jq -n \
       --arg nsx_api_manager "$NSX_API_MANAGER" \
       --arg nsx_api_user "$NSX_API_USER" \
@@ -271,21 +334,6 @@ if [ "$NSX_ENABLED" == "true" ]; then
       --arg nsx_superuser_key "$NSX_SUPERUSER_KEY" \
       '
       {
-        ".properties.cloud_provider": {
-          "value": "vSphere"
-        },
-        ".properties.cloud_provider.vsphere.vcenter_ip": {
-          "value": $vcenter_host
-        },
-        ".properties.cloud_provider.vsphere.vcenter_dc": {
-          "value": $vcenter_datacenter
-        },
-        ".properties.cloud_provider.vsphere.vcenter_ds": {
-          "value": $vcenter_datastore
-        },
-        ".properties.cloud_provider.vsphere.vcenter_vms": {
-          "value": $pks_vm_folder
-        },
         ".properties.network_selector": {
             "value": "nsx"
         },
@@ -313,31 +361,10 @@ if [ "$NSX_ENABLED" == "true" ]; then
         ".properties.network_selector.nsx.floating-ip-pool-ids": {
             "value": $floating_ip_pool_id
         },
-        ".properties.cloud_provider.vsphere.vcenter_master_creds": {
-          "value": {
-            "identity": $vcenter_username,
-            "password": $vcenter_password
-          }
-        },
         ".properties.network_selector.nsx.nodes-ip-block-id": {
           "value": $nodes_ip_block_id
         }
       }
-
-      +
-
-      if $has_vcenter_worker_creds != "0" then
-      {
-        ".properties.cloud_provider.vsphere.vcenter_worker_creds": {
-          "value": {
-            "identity": $vcenter_username,
-            "password": $vcenter_password
-          }
-        }
-      }
-      else
-      .
-      end
 
       +
 
