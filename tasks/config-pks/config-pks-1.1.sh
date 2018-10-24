@@ -266,21 +266,6 @@ pks_vcenter_properties=$(
         }
       }
     }
-
-    +
-
-    if $has_vcenter_worker_creds != "0" then
-    {
-      ".properties.cloud_provider.vsphere.vcenter_worker_creds": {
-        "value": {
-          "identity": $vcenter_username,
-          "password": $vcenter_password
-        }
-      }
-    }
-    else
-    .
-    end
   '
 )
 
