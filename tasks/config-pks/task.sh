@@ -11,7 +11,7 @@ source $ROOT_DIR/nsx-t-ci-pipeline/functions/check_null_variables.sh
 
 echo "checking if NSX is enabled"
 if [ "$NSX_ENABLED" == "true" ]; then
-  echo "NSX enabled...
+  echo "NSX enabled..."
 
   # Check if NSX Manager is accessible before pulling down its cert
   set +e
