@@ -440,9 +440,9 @@ if [ "$NSX_ENABLED" == "true" ]; then
     --skip-ssl-validation \
     configure-product \
     --product-name pivotal-container-service \
-    --product-properties "$pks_nsx_vcenter_properties"
+    --product-properties "$pks_nsx_properties"
 
-  echo "Finished configuring NSX/vCenter properties"
+  echo "Finished configuring NSX properties"
 
 fi
 
