@@ -10,8 +10,9 @@ export PYTHON_LIB_DIR=$(cd $PIPELINE_DIR/python && pwd)
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/yaml2json.sh
 source $ROOT_DIR/nsx-t-ci-pipeline/functions/check_null_variables.sh
 
-
+echo "checking if NSX is enabled"
 if [ "$NSX_ENABLED" == "false" ]; then
+  echo "NSX not enabled, nothing to validate"
   exit 0
 fi
 
