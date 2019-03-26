@@ -179,7 +179,7 @@ echo "Finished configuring network properties"
 
   pks_syslog_properties=$(
     jq -n \
-    --arg pks_syslog_migration_selector "$PKS_SYSLOG_MIGRATION_ENABLED" \
+    --arg pks_syslog_selector "$PKS_SYSLOG_MIGRATION_ENABLED" \
     --arg pks_syslog_address "$PKS_SYSLOG_ADDRESS" \
     --arg pks_syslog_port "$PKS_SYSLOG_PORT" \
     --arg pks_syslog_transport_protocol "$PKS_SYSLOG_TRANSPORT_PROTOCOL" \
@@ -189,7 +189,7 @@ echo "Finished configuring network properties"
       '
 
       # Syslog
-      if $pks_syslog_migration_selector == "enabled" then
+      if $pks_syslog_selector == "enabled" then
         {
           ".properties.syslog_migration_selector.enabled.address": {
             "value": $pks_syslog_address
